@@ -70,6 +70,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             ]
         ])->execute();
 
+        $command->waitUntilTableExists($tableName);
         return [$tableName, $fieldName1];
     }
 
@@ -107,6 +108,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
                 'WriteCapacityUnits' => 5,
             ]
         ])->execute();
+        $command->waitUntilTableExists($tableName);
 
         return [$tableName, $fieldName1, $fieldName2];
     }
@@ -143,6 +145,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $table = \test\data\Customer::tableName();
         if ($command->tableExists($table)) {
             $command->deleteTable($table)->execute();
+            $command->waitUntilTableNotExists($table);
         }
         $command->createTable($table, [
             'AttributeDefinitions' => [
@@ -162,6 +165,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
                 'WriteCapacityUnits' => 10
             ]
         ])->execute();
+        $command->waitUntilTableExists($table);
     }
 
     protected function createCustomersRangeTable()
@@ -171,6 +175,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $table = \test\data\CustomerRange::tableName();
         if ($command->tableExists($table)) {
             $command->deleteTable($table)->execute();
+            $command->waitUntilTableNotExists($table);
         }
         $index = \test\data\CustomerRange::secondaryIndex()[0];
         $command->createTable($table, [
@@ -221,5 +226,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
                 'WriteCapacityUnits' => 10
             ]
         ])->execute();
+        $command->waitUntilTableExists($table);
     }
 }

@@ -13,7 +13,7 @@ This is a DynamoDB extension for Yii2
 This extension requires
 - PHP 5.4
 - Yii2
-- AWS PHP SDK 2.8
+- AWS PHP SDK 3.x
 
 ## Installation
 

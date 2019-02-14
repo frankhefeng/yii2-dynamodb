@@ -8,6 +8,8 @@ namespace UrbanIndo\Yii2\DynamoDb;
 
 use Yii;
 use Aws\DynamoDb\DynamoDbClient;
+use Aws\DoctrineCacheAdapter;
+use Doctrine\Common\Cache\ApcuCache;
 
 /**
  * Connection wraps DynamoDB connection for Aws PHP SDK.
@@ -21,7 +23,6 @@ class Connection extends \yii\base\Component
     /**
      * The configuration for DynamoDB client.
      * @var array
-     * @see http://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html#factory-method
      */
     public $config;
 
@@ -30,7 +31,7 @@ class Connection extends \yii\base\Component
      * @var DynamoDbClient
      */
     protected $_client;
-    
+
     /**
      * The query builder.
      * @var QueryBuilder
@@ -44,9 +45,12 @@ class Connection extends \yii\base\Component
     public function init()
     {
         parent::init();
-        //For v2 compatibility.
-        //TODO: remove deprecated.
-        $this->_client = DynamoDbClient::factory($this->config);
+
+        if (empty($this->config['credentials'])) { //using IAM Role
+            $this->config['credentials'] = new DoctrineCacheAdapter(new ApcuCache);
+        }
+
+        $this->_client = new DynamoDbClient($this->config);
     }
 
     /**

@@ -89,12 +89,12 @@ class QueryBuilder extends BaseObject
             $keyCondition = $this->isConditionMatchKeySchema($query);
             $supportBatchGetItem = $this->isOperatorSupportBatchGetItem($query->where);
             if (empty($query->where) || !empty($query->indexBy) || !empty($query->limit)
-                        || !empty($query->offset) || !empty($query->orderBy)
-                        || $keyCondition != 1 || !$supportBatchGetItem) {
+                || !empty($query->offset) || !empty($query->orderBy)
+                || $keyCondition != 1 || !$supportBatchGetItem) {
                 // WARNING AWS SDK not support operator beside '=' if use Query method
                 // TODO Slice where clause query
                 if (!empty($query->orderBy) && ($keyCondition == 1 || $keyCondition == 2)
-                        && $supportBatchGetItem) {
+                    && $supportBatchGetItem) {
                     $query->using = Query::USING_QUERY;
                 } else {
                     $query->using = Query::USING_SCAN;
@@ -390,10 +390,10 @@ class QueryBuilder extends BaseObject
     {
         if (!empty($query->select)) {
             return is_array($query->select) ? [
-                    'ProjectionExpression' => implode(', ', $query->select)
-                ] : [
-                    'ProjectionExpression' => $query->select
-                ];
+                'ProjectionExpression' => implode(', ', $query->select)
+            ] : [
+                'ProjectionExpression' => $query->select
+            ];
         } else {
             return [];
         }
@@ -474,9 +474,9 @@ class QueryBuilder extends BaseObject
         $where = $this->buildCondition($condition, $params);
 
         return $where === '' ? [] : [
-                'FilterExpression' => $where,
-                'ExpressionAttributeValues' => $this->paramToExpressionAttributeValues($params),
-            ];
+            'FilterExpression' => $where,
+            'ExpressionAttributeValues' => $this->paramToExpressionAttributeValues($params),
+        ];
     }
 
     /**
@@ -491,7 +491,7 @@ class QueryBuilder extends BaseObject
         // string, and single boolean
         foreach ($params as $i => $value) {
             if (is_int($value)) {
-                $params[$i] = ['N' => $value];
+                $params[$i] = ['N' => strval($value)];
             } elseif (is_string($value)) {
                 $params[$i] = ['S' => $value];
             } elseif (is_bool($value)) {
@@ -508,7 +508,11 @@ class QueryBuilder extends BaseObject
                 } elseif (is_int($subValue)) {
                     $params[$i] = ['NS' => $value];
                 } elseif (is_string($subValue)) {
-                    $params[$i] = ['SS' => $value];
+                    $params[$i] = [];
+                    foreach ($value as $subString)
+                    {
+                        $params[$i]['L'][] = ['S' => $subString];
+                    }
                 } else {
                     $params[$i] = ['BS' => $value];
                 }

@@ -135,9 +135,33 @@ class Command extends BaseObject
         try {
             $this->describeTable($table)->execute();
             return true;
-        } catch (\Aws\DynamoDb\Exception\ResourceNotFoundException $exc) {
-            return false;
+        } catch (\Aws\DynamoDb\Exception\DynamoDbException $exc) {
+            if ($exc->getAwsErrorCode() == 'ResourceNotFoundException') {
+                return false;
+            } else {
+                throw $exc;
+            }
         }
+    }
+
+    /**
+     * Wait until a table exists
+     * @param string $table The name of the table.
+     *
+     */
+    public function waitUntilTableExists($table)
+    {
+        $this->getClient()->waitUntil('TableExists', ['TableName' => $table]);
+    }
+
+    /**
+     * Wait until a table not exists
+     * @param string $table The name of the table.
+     *
+     */
+    public function waitUntilTableNotExists($table)
+    {
+        $this->getClient()->waitUntil('TableNotExists', ['TableName' => $table]);
     }
 
     /**

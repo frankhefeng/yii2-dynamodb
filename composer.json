@@ -8,11 +8,11 @@
             "email": "petra.barus@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
         "php": ">=5.4.0",
         "yiisoft/yii2": "*",
-        "aws/aws-sdk-php": "~2.8.15"
+        "aws/aws-sdk-php": "3.*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.6.*",
